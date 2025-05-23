@@ -28,11 +28,17 @@
             </li>
         </ul>
 
+        <div v-if="rawJson" class="mt-6">
+            <h2 class="text-lg font-semibold mb-2">JSON DTO:</h2>
+            <pre class="bg-gray-100 text-sm p-2 rounded overflow-x-auto">{{ rawJson }}</pre>
+        </div>
+
         <div v-if="error" class="mt-4 text-red-500">
             Ошибка при проверке: {{ error }}
         </div>
     </div>
 </template>
+
 
 <script setup>
 import { ref } from 'vue'
@@ -42,6 +48,8 @@ const input = ref('')
 const results = ref([])
 const loading = ref(false)
 const error = ref(null)
+const rawJson = ref('')
+
 
 const checkDomains = async () => {
     const domains = input.value
@@ -55,6 +63,7 @@ const checkDomains = async () => {
     error.value = null
     results.value = []
 
+
     try {
         const response = await axios.post('/api/domain-check', { domains }, {
             headers: {
@@ -62,6 +71,7 @@ const checkDomains = async () => {
             }
         })
         results.value = response.data.results
+        rawJson.value = JSON.stringify(response.data, null, 2)
     } catch (err) {
         console.error('Ошибка при проверке доменов:', err)
         error.value = 'Не удалось проверить домены. Попробуйте снова.'
