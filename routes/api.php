@@ -1,8 +1,31 @@
 <?php
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
+use App\Http\Controllers\AuthController;
 
-Route::post('/domain-check', function (Request $request) {
+Route::post('/register', function (Request $request) {
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => bcrypt($request->password),
+    ]);
+
+    return $user;
+});
+
+Route::post('/login', function (Request $request) {
+    if (!Auth::attempt($request->only('email', 'password'))) {
+        return response()->json(['message' => 'Invalid login'], 401);
+    }
+
+    $user = Auth::user();
+    $token = $user->createToken('api-token')->plainTextToken;
+
+    return response()->json(['token' => $token]);
+});
+
+Route::middleware('auth:sanctum')->post('/domain-check', function (Request $request) {
     $validated = $request->validate([
         'domains' => 'required|array',
         'domains.*' => 'required|string',
@@ -25,4 +48,10 @@ Route::post('/domain-check', function (Request $request) {
     });
 
     return response()->json(['results' => $results]);
+});
+
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
 });

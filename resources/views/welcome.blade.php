@@ -7,6 +7,7 @@
     </head>
     <body>
         <div id="app">
+            <site-header></site-header>
             <domain-checker></domain-checker>
         </div>
     </body>
