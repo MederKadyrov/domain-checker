@@ -20,7 +20,7 @@ Route::post('/domain-check', function (Request $request) {
             'domain' => $domain,
             'status' => $isAvailable
                 ? 'Доступен для регистрации'
-                : 'Занят до ' . now()->addYears(1)->format('Y-m-d'),
+                : 'Занят до ' . now()->addDays(rand(30, 365))->format('Y-m-d'),
         ];
     });
 
